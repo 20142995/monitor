@@ -44,7 +44,7 @@ if __name__ == '__main__':
         r = requests.get(data[i]['url'])
         r.encoding = r.apparent_encoding
         for version, uptime in re.findall(r'版本：</span>\s+(.*?)</td>.*?发布时间：</span>(.*?)</td>', r.text, re.S)[:1]:
-            if version not in data[i].get('version', ''):
+            if version != data[i].get('version', ''):
                 text = '{}:\n更新版本:{}\n更新时间:{}'.format(
                     data[i]['name'], version, uptime)
                 send_text(text, DINGTALK_TOKEN)
