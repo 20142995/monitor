@@ -4,16 +4,9 @@
 name: 服务监控
 
 on:
-  release:
-    types: [published]
-  push:
-    tags:
-    - 'v*'
   schedule:
     - cron: '*/5 * * * *'
-  watch:
-    types: [started]
-
+    
 jobs:
   build:
 
