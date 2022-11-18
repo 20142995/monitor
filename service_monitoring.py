@@ -25,9 +25,9 @@ def check_ddddocr():
         pass
     return False
 
-
 if __name__ == '__main__':
     text = '服务监控:'
+
     text += '\n{}\t{}\t{}'.format("验证码识别接口", DDDDOCR_URL,
                                   '正常' if check_ddddocr() else '异常')
     send_text(text, DINGTALK_TOKEN)
