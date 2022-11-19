@@ -30,25 +30,30 @@ if __name__ == '__main__':
     data = rc.get('repos')
     if data is None:
         data = {
-            'BeichenDream/Godzilla':{},
+            'BeichenDream/Godzilla': {},
         }
     else:
         data = json.loads(data)
     headers = {"Authorization": "token {}".format(GH_TOKEN)}
     for name in data:
         try:
-            rj = requests.get('https://api.github.com/repos/{}/commits'.format(name), headers=headers, verify=False).json()
+            rj = requests.get('https://api.github.com/repos/{}/commits'.format(name),
+                              headers=headers, verify=False).json()
             for commit in rj[:1]:
-                date = time.strftime("%Y-%m-%d %H:%M:%S",time.strptime(commit['commit']['committer']['date'], "%Y-%m-%dT%H:%M:%SZ"))
+                date = time.strftime("%Y-%m-%d %H:%M:%S", time.strptime(
+                    commit['commit']['committer']['date'], "%Y-%m-%dT%H:%M:%SZ"))
                 message = commit['commit']['message']
-                if data[name].get('commit','') != date:
-                    send_text("{}:\n{} commit {}".format(name,date,message), DINGTALK_TOKEN)
+                if data[name].get('commit', '') != date:
+                    send_text("{}:\n{} commit {}".format(
+                        name, date, message), DINGTALK_TOKEN)
                     data[name]['commit'] = date
             time.sleep(1)
-            rj = requests.get('https://api.github.com/repos/{}/releases/latest'.format(name), headers=headers, verify=False).json()
+            rj = requests.get('https://api.github.com/repos/{}/releases/latest'.format(
+                name), headers=headers, verify=False).json()
             version = rj['name']
-            if data[name].get('version','') != version:
-                send_text("{}:\nversion {}".format(name,version), DINGTALK_TOKEN)
+            if data[name].get('version', '') != version:
+                send_text("{}:\nversion {}".format(
+                    name, version), DINGTALK_TOKEN)
                 data[name]['version'] = version
             time.sleep(1)
         except:
