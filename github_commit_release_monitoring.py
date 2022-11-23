@@ -142,6 +142,7 @@ if __name__ == '__main__':
         ]
     headers = {"Authorization": "token {}".format(GH_TOKEN)}
     for name in repos:
+        print(name)
         rc = redis.Redis(host=host, port=int(port), password=REDIS_PASS,
                         decode_responses=True, charset='UTF-8', encoding='UTF-8')
         data = rc.get(name)
@@ -154,6 +155,7 @@ if __name__ == '__main__':
             rj1 = requests.get('https://api.github.com/repos/{}'.format(name),
                               headers=headers, verify=False).json()
             msg['description'] = 'description:{}'.format(rj1['description'])
+            time.sleep(0.1)
         except:
             pass
 
@@ -167,7 +169,7 @@ if __name__ == '__main__':
                 if data.get('commit', '') != date:
                     msg['commit'] = "commit:{}:{}".format(date, message)
                     data['commit'] = date
-            time.sleep(1)
+            time.sleep(0.1)
         except:
             pass
         try:
@@ -177,7 +179,7 @@ if __name__ == '__main__':
             if data.get('version', '') != version:
                 msg['version'] = "version:{}->{}".format(data.get('version', ''), version)
                 data['version'] = version
-            time.sleep(1)
+            time.sleep(0.1)
         except:
             pass
         if 'version' in msg or 'commit' in msg:
