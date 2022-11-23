@@ -6,7 +6,6 @@ import json
 import redis
 import time
 import requests
-import traceback
 requests.packages.urllib3.disable_warnings()
 
 REDIS_HOST = os.getenv('REDIS_HOST')
