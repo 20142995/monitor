@@ -140,6 +140,7 @@ if __name__ == '__main__':
         "PyCQA/bandit",
         "zsdlove/Hades"
         ]
+    repos = set(repos)
     headers = {"Authorization": "token {}".format(GH_TOKEN)}
     for name in repos:
         print(name)
