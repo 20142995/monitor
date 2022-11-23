@@ -26,8 +26,6 @@ def send_text(text, token):
 
 if __name__ == '__main__':
     host, port = REDIS_HOST.split(":")
-    rc = redis.Redis(host=host, port=int(port), password=REDIS_PASS,
-                     decode_responses=True, charset='UTF-8', encoding='UTF-8')
     repos = [
         'BeichenDream/Godzilla',
         'tpt11fb/AttackTomcat',
@@ -142,16 +140,15 @@ if __name__ == '__main__':
         "PyCQA/bandit",
         "zsdlove/Hades"
         ]
-    data = rc.get('repos')
-    if data is None:
-        data = {}
-    else:
-        data = json.loads(data)
-    for r in repos:
-        if r not in data:
-            data[r] = {}
     headers = {"Authorization": "token {}".format(GH_TOKEN)}
-    for name in data:
+    for name in repos:
+        rc = redis.Redis(host=host, port=int(port), password=REDIS_PASS,
+                        decode_responses=True, charset='UTF-8', encoding='UTF-8')
+        data = rc.get(name)
+        if data is None:
+            data = {}
+        else:
+            data = json.loads(data)
         msg = {}
         try:
             rj1 = requests.get('https://api.github.com/repos/{}'.format(name),
@@ -167,9 +164,9 @@ if __name__ == '__main__':
                 date = time.strftime("%Y-%m-%d %H:%M:%S", time.strptime(
                     commit['commit']['committer']['date'], "%Y-%m-%dT%H:%M:%SZ"))
                 message = commit['commit']['message']
-                if data[name].get('commit', '') != date:
+                if data.get('commit', '') != date:
                     msg['commit'] = "commit:{}:{}".format(date, message)
-                    data[name]['commit'] = date
+                    data['commit'] = date
             time.sleep(1)
         except:
             pass
@@ -177,12 +174,12 @@ if __name__ == '__main__':
             rj3 = requests.get('https://api.github.com/repos/{}/releases/latest'.format(
                 name), headers=headers, verify=False).json()
             version = rj3['name']
-            if data[name].get('version', '') != version:
-                msg['version'] = "version:{}->{}".format(data[name].get('version', ''), version)
-                data[name]['version'] = version
+            if data.get('version', '') != version:
+                msg['version'] = "version:{}->{}".format(data.get('version', ''), version)
+                data['version'] = version
             time.sleep(1)
         except:
             pass
         if 'version' in msg or 'commit' in msg:
             send_text('\n'.join([name,msg.get('description',''),msg.get('commit',''),msg.get('version','')]), DINGTALK_TOKEN)
-    rc.set('repos', json.dumps(data))
+        rc.set(name, json.dumps(data))
