@@ -29,4 +29,4 @@ jobs:
          REDIS_HOST: ${{ secrets.REDIS_HOST }}
          REDIS_PASS: ${{ secrets.REDIS_PASS }}
       run: |
-        python service_monitoring.py
+        python run.py
