@@ -21,7 +21,6 @@ jobs:
     - name: Install dependencies
       run: |
         pip install requests
-        pip install redis
     - name: service monitoring
       env: 
          DINGTALK_TOKEN: ${{ secrets.DINGTALK_TOKEN }}
