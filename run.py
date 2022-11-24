@@ -1,13 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: UTF-8 -*-
 import os
-import redis
+import socket
 import requests
 
 DINGTALK_TOKEN = os.getenv('DINGTALK_TOKEN')
-DDDDOCR_URL = os.getenv('DDDDOCR_URL')
-REDIS_HOST = os.getenv('REDIS_HOST')
-REDIS_PASS = os.getenv('REDIS_PASS')
+HOSTS = os.getenv('HOSTS')
+
+
+def check(host_port):
+    host, port = host_port.split(':')
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.connect((str(host), int(port)))
+        sock.close()
+        return True
+    except:
+        return False
+
 
 def send_text(text, token):
     headers = {'Content-Type': 'application/json'}
@@ -18,30 +28,11 @@ def send_text(text, token):
     return r.json()
 
 
-def check_ddddocr():
-    try:
-        rt = requests.get('{}/ping'.format(DDDDOCR_URL)).text
-        if rt == 'pong':
-            return True
-    except:
-        pass
-    return False
-
-def check_redis():
-    try:
-        host, port = REDIS_HOST.split(":")
-        rc = redis.Redis(host=host, port=int(port), password=REDIS_PASS,
-                        decode_responses=True, charset='UTF-8', encoding='UTF-8')
-        return True
-    except:
-        pass
-    return False
-
-if __name__ == '__main__':
-    text = '服务监控:'
-
-    text += '\n{}\t{}\t{}'.format("验证码识别接口", DDDDOCR_URL,
-                                  '正常' if check_ddddocr() else '异常')
-    text += '\n{}\t{}\t{}'.format("redis", REDIS_HOST,
-                                  '正常' if check_redis() else '异常')
+fail = []
+for host_port in HOSTS.split('\n'):
+    if ':' in host_port:
+        if not check(host_port):
+            fail.append(host_port)
+if fail:
+    text = '服务监控告警:\n{}\n无法访问'.format('\n'.join(fail))
     send_text(text, DINGTALK_TOKEN)
