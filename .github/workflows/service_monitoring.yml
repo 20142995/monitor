@@ -24,8 +24,6 @@ jobs:
     - name: service monitoring
       env: 
          DINGTALK_TOKEN: ${{ secrets.DINGTALK_TOKEN }}
-         DDDDOCR_URL: ${{ secrets.DDDDOCR_URL }}
-         REDIS_HOST: ${{ secrets.REDIS_HOST }}
-         REDIS_PASS: ${{ secrets.REDIS_PASS }}
+         HOSTS: ${{ secrets.HOSTS }}
       run: |
         python run.py
